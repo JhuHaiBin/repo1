@@ -1,0 +1,70 @@
+<!doctype html>
+<html  class="x-admin-sm">
+<head>
+	<meta charset="UTF-8">
+	<title>后台登录-X-admin2.1</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="./css/font.css">
+	<link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="./js/cookie.js"></script>
+
+</head>
+<body class="login-bg">
+    
+    <div id="app" class="login layui-anim layui-anim-up">
+        <div class="message">朱海斌管理登录</div>
+        <div id="darkbannerwrap" ></div>
+        
+        <form method="post" class="layui-form" >
+            <input v-model="user.userName" placeholder="用户名"  type="text" lay-verify="required" class="layui-input" >
+            <span v-text="text" style="color: #bd2c00"></span>
+            <hr class="hr15">
+            <input v-model="user.password" lay-verify="required" placeholder="密码"  type="password" class="layui-input">
+            <hr class="hr15">
+            <input value="登录" lay-submit lay-filter="login" style="width:100%;" type="button" @click="login">
+            <hr class="hr15">
+            <input value="注册" lay-submit lay-filter="login" style="width:100%;" type="button" @click="register">
+            <hr class="hr20" >
+        </form>
+    </div>
+
+
+</body>
+</html>
+<script src="js/vue.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data:{
+            user:{},
+
+        },
+        methods:{
+            login(){
+                var _this = this;
+                axios.post("http://localhost:8080/user/login",this.user).then(res=>{
+                    if(res.data.state){
+                        //将登录用户信息放入localStorage中
+                        localStorage.setItem("user",JSON.stringify(res.data.user))
+                        //跳转
+                        location.href="http://localhost:8080/index.html"
+                    }else{
+                        _this.text = res.data.msg
+                    }
+
+                })
+            },
+            register(){
+                //跳转至注册界面
+                location.href="http://localhost:8080/register.html"
+            }
+        }
+    })
+</script>

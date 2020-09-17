@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.1</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div id="app" class="x-body">
+
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label for="L_email" class="layui-form-label">
+                  <span class="x-red">*</span>名字
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="L_email" v-model="emp.name" required="" lay-verify="email"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_username" class="layui-form-label">
+                  <span class="x-red">*</span>头像
+              </label>
+              <div class="layui-input-inline">
+                  <input type="file" id="L_username" ref="myPhoto" required="" lay-verify="nikename"
+                  autocomplete="off" >
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_pass" class="layui-form-label">
+                  <span class="x-red">*</span>工资
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="L_pass" v-model="emp.salary" required="" lay-verify="pass"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+                  <span class="x-red">*</span>年龄
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="L_repass" v-model="emp.age" required="" lay-verify="repass"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  type="button" class="layui-btn" @click="saveEmp">
+                  增加
+              </button>
+              <div v-text="text"></div>
+          </div>
+      </form>
+    </div>
+
+  </body>
+
+</html>
+<script src="js/vue.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data:{
+            //存放员工信息
+            emp:{},
+            text:"",
+        },
+        methods:{
+            saveEmp(){
+                //新建一个表单（Tips：ajax底层也是传递一个表单）
+                var formData = new FormData();
+                formData.append("name",this.emp.name);
+                formData.append("salary",this.emp.salary);
+                formData.append("age",this.emp.age);
+                //this.$refs 代表这个页面所用的vue指令
+                formData.append("photo",this.$refs.myPhoto.files[0]);
+                //上传文件给后端时，请求方式必须是post，enctype必须为multipart/form-data
+                var _this = this;
+                axios({
+                    method:"post",
+                    url:"http://localhost:8080/emp/save",
+                    data:formData,
+                    headers:{
+                        'content-type':'multipart/form-data'
+                    }
+                }).then(function (res) {
+                    if(res.data.state){
+                        if(window.confirm(res.data.msg+"，点击确定继续添加")){
+                            _this.emp = { };
+                        }else{
+                            _this.text= "添加成功!"
+                        }
+                    }else{
+                        alert(res.data.msg)
+                    }
+                })
+            }
+        }
+    })
+</script>

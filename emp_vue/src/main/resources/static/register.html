@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <!-- Google Chrome Frame也可以让IE用上Chrome的引擎: -->
+    <meta name="renderer" content="webkit">
+    <!--国产浏览器高速模式-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 定义页面的最新版本 -->
+    <meta name="description" content="网站简介"/>
+    <!-- 网站简介 -->
+    <meta name="keywords" content="搜索关键字，以半角英文逗号隔开"/>
+    <title>后台管理界面登陆</title>
+
+    <link rel="stylesheet" type="text/css" href="css/base.css">
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+
+</head>
+<body>
+<form>
+    <div id="app" class="register_main">
+
+        <div class="register_title" v-text="text">
+        </div>
+
+        <div class="register_account">
+            <!--  与服务器异步通信，不需要提交表单          -->
+            <input type="text" v-model="user.userName" placeholder="用户名"/>
+        </div>
+        <div class="register_account">
+            <input type="text" v-model="user.realName" placeholder="真实姓名"/>
+        </div>
+        <div class="register_password">
+            <input type="password" v-model="user.password" placeholder="密码"/>
+        </div>
+        <br>
+        <div>性别:
+            <label><input type="radio" v-model="user.sex" value="男">男</label>
+            <label><input type="radio" v-model="user.sex" value="女">女</label>
+        </div>
+        <br>
+        <div class="register_account">
+            <input type="text" style="float: left" v-model="code" placeholder="请输入验证码"/>
+
+            <img id="code" style="float: left" :src="url" />
+            <a  href="javascript:;" style="float: left" @click="get_another">换一张</a>
+        </div>
+        <div class="register_submit">
+			<button @click="register">注&nbsp;册</button>
+        </div>
+
+    </div>
+</form>
+</body>
+</html>
+<script src="js/vue.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var app = new Vue({
+        el: "#app",
+        data:{
+            url:"",
+            user:{},
+            code:"",
+            msg:"",
+            text:"注册界面",
+        },
+        methods:{
+            get_another(){
+                this.getUrl();
+            },
+            //获取验证码
+            getUrl(){
+                var _this = this;
+                axios.get("http://localhost:8080/user/getImage?time="+Math.random()).then(res=>{
+                    console.log(res.data)
+                    _this.url = res.data
+                });
+            },
+            //注册用户
+            register(){
+                var _this = this;
+                axios.post("http://localhost:8080/user/register?code="+this.code,this.user).then(res=>{
+                    console.log(res.data.state)
+                    if(res.data.state){
+                        _this.text = "注册成功！欢迎您";
+                        location.href="/login.html";
+                    }else{
+                        alert(res.data.msg);
+                    }
+                });
+            }
+        },
+        //created()在页面加载前生效
+        created(){
+            this.getUrl();
+        }
+    })
+
+
+</script>
